@@ -43,18 +43,34 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadDrugsData() {
         try {
             console.log('Начинаем загрузку данных...');
-            const url = `${API_BASE_URL}/api/search.json`;
+            const url = `${API_BASE_URL}/data/database.csv`;
             console.log('Загружаем данные с URL:', url);
             const response = await fetch(url);
             console.log('Статус ответа:', response.status);
-            const data = await response.json();
-            console.log('Полученные данные:', data);
-            if (data.status === 'success') {
-                drugsData = data.results;
-                console.log('Данные успешно загружены');
-            } else {
-                console.error('Неверный формат данных:', data);
-            }
+            const text = await response.text();
+            console.log('Данные получены, обрабатываем CSV');
+            
+            // Парсим CSV
+            const rows = text.split('\n').map(row => row.split(';'));
+            const headers = rows[0];
+            drugsData = rows.slice(1)
+                .filter(row => row.length === headers.length)
+                .map(row => ({
+                    name: row[1] || '',
+                    trade_names: row[2] || '',
+                    classification: row[3] || '',
+                    mechanism: row[4] || '',
+                    indications: row[5] || '',
+                    side_effects: row[6] || '',
+                    contraindications: row[7] || '',
+                    interactions: row[8] || '',
+                    usage: row[9] || '',
+                    storage: row[12] || '',
+                    dog_dosage: row[13] || '',
+                    cat_dosage: row[14] || ''
+                }));
+            
+            console.log('Данные успешно загружены');
         } catch (error) {
             console.error('Ошибка при загрузке данных:', error);
             console.error('Полный текст ошибки:', error.toString());
