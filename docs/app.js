@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadDrugsData() {
         try {
             console.log('Начинаем загрузку данных...');
-            const url = `${API_BASE_URL}/api/search`;
+            const url = `${API_BASE_URL}/api/search.json`;
             console.log('Загружаем данные с URL:', url);
             const response = await fetch(url);
             console.log('Статус ответа:', response.status);
