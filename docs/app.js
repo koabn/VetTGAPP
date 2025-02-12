@@ -42,13 +42,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Загружаем данные при старте
     async function loadDrugsData() {
         try {
-            const response = await fetch(`${API_BASE_URL}/docs/api/search`);
+            console.log('Начинаем загрузку данных...');
+            const url = `${API_BASE_URL}/api/search`;
+            console.log('Загружаем данные с URL:', url);
+            const response = await fetch(url);
+            console.log('Статус ответа:', response.status);
             const data = await response.json();
+            console.log('Полученные данные:', data);
             if (data.status === 'success') {
                 drugsData = data.results;
+                console.log('Данные успешно загружены');
+            } else {
+                console.error('Неверный формат данных:', data);
             }
         } catch (error) {
-            console.error('Error loading drugs data:', error);
+            console.error('Ошибка при загрузке данных:', error);
+            console.error('Полный текст ошибки:', error.toString());
+            errorDiv.textContent = 'Ошибка при загрузке данных: ' + error.toString();
+            errorDiv.style.display = 'block';
         }
     }
     
