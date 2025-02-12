@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadDrugsData() {
         try {
             console.log('Начинаем загрузку данных...');
-            const url = `${API_BASE_URL}/../data/database.csv`;
+            // Используем путь относительно корня репозитория
+            const url = 'https://raw.githubusercontent.com/koabn/VetTGAPP/main/data/database.csv';
             console.log('Загружаем данные с URL:', url);
             const response = await fetch(url);
             console.log('Статус ответа:', response.status);
