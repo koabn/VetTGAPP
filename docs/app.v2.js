@@ -43,11 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadDrugsData() {
         try {
             console.log('Начинаем загрузку данных...');
-            const url = `${API_BASE_URL}/data/database.csv`;
+            const url = `${API_BASE_URL}/../data/database.csv`;
             console.log('Загружаем данные с URL:', url);
             const response = await fetch(url);
             console.log('Статус ответа:', response.status);
-            const text = await response.text();
+            
+            // Получаем данные как ArrayBuffer для правильной декодировки
+            const buffer = await response.arrayBuffer();
+            // Декодируем из Windows-1251
+            const decoder = new TextDecoder('windows-1251');
+            const text = decoder.decode(buffer);
+            
             console.log('Данные получены, обрабатываем CSV');
             
             // Парсим CSV
@@ -70,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     cat_dosage: row[14] || ''
                 }));
             
-            console.log('Данные успешно загружены');
+            console.log('Данные успешно загружены, первый препарат:', drugsData[0]);
         } catch (error) {
             console.error('Ошибка при загрузке данных:', error);
             console.error('Полный текст ошибки:', error.toString());
