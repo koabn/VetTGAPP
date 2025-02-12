@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vet Assistant</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="search-section">
+                <input type="text" id="searchInput" placeholder="Введите название препарата..." class="search-input">
+                <button class="search-button">Найти</button>
+            </div>
+
+            <div id="confirmation-section" class="confirmation-section" style="display: none;">
+                <div class="confirmation-title">Выберите препарат:</div>
+                <div id="drug-options" class="drug-options"></div>
+            </div>
+
+            <div id="results" class="results-section">
+                <div id="drug-info" class="drug-info-container" style="display: none;">
+                    <div class="categories-section">
+                        <div class="categories-title">Выберите категории информации:</div>
+                        <div class="categories-grid">
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="dosage" checked>
+                                <span class="category-text">💊 Дозировка</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="mechanism" checked>
+                                <span class="category-text">⚡ Механизм действия</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="indications" checked>
+                                <span class="category-text">🎯 Показания</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="side_effects" checked>
+                                <span class="category-text">⚕️ Побочные эффекты</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="contraindications" checked>
+                                <span class="category-text">⚠️ Противопоказания</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="interactions" checked>
+                                <span class="category-text">🔄 Взаимодействия</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="usage" checked>
+                                <span class="category-text">💉 Применение</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="storage" checked>
+                                <span class="category-text">🏠 Хранение</span>
+                            </label>
+                        </div>
+                        <div class="categories-controls">
+                            <button id="selectAllCategories" class="control-button">Выбрать все</button>
+                            <button id="clearCategories" class="control-button">Очистить</button>
+                        </div>
+                    </div>
+                    <div id="drug-content"></div>
+                </div>
+            </div>
+            <div id="error" class="error-message"></div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html> 
