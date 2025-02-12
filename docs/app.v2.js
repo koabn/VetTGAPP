@@ -120,16 +120,24 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Функция поиска препаратов
     function searchDrugs(query) {
+        console.log('Начинаем поиск по запросу:', query);
+        console.log('Состояние drugsData:', drugsData);
+        
         if (!drugsData) {
+            console.log('drugsData не загружены');
             errorDiv.textContent = 'Данные еще не загружены';
             errorDiv.style.display = 'block';
             return;
         }
         
-        const results = drugsData.filter(drug => 
-            drug.name.toLowerCase().includes(query) || 
-            (drug.trade_names && drug.trade_names.toLowerCase().includes(query))
-        );
+        const results = drugsData.filter(drug => {
+            const nameMatch = drug.name.toLowerCase().includes(query);
+            const tradeMatch = drug.trade_names && drug.trade_names.toLowerCase().includes(query);
+            console.log(`Проверяем препарат ${drug.name}:`, { nameMatch, tradeMatch });
+            return nameMatch || tradeMatch;
+        });
+        
+        console.log('Результаты поиска:', results);
         
         if (results.length > 0) {
             showDrugOptions(results);
