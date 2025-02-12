@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tg.MainButton.hide();
     
     // Определяем базовый URL для API
-    const API_BASE_URL = 'https://sanakoev.github.io/vet-app';
+    const API_BASE_URL = 'https://koabn.github.io/VetTGAPP';
     
     // Получаем элементы интерфейса
     const searchInput = document.getElementById('searchInput');
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Загружаем данные при старте
     async function loadDrugsData() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/search`);
+            const response = await fetch(`${API_BASE_URL}/docs/api/search`);
             const data = await response.json();
             if (data.status === 'success') {
                 drugsData = data.results;
