@@ -48,34 +48,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(url);
             console.log('Статус ответа:', response.status);
             
+            // Проверяем поддержку кодировки
+            try {
+                const testDecoder = new TextDecoder('windows-1251');
+                console.log('Кодировка windows-1251 поддерживается');
+            } catch (e) {
+                console.error('Кодировка windows-1251 не поддерживается:', e);
+                // Если windows-1251 не поддерживается, пробуем другие варианты
+                const text = await response.text();
+                console.log('Первые 100 символов текста:', text.substring(0, 100));
+                drugsData = parseCSV(text);
+                return;
+            }
+            
             // Получаем данные как ArrayBuffer для правильной декодировки
             const buffer = await response.arrayBuffer();
             // Декодируем из Windows-1251
             const decoder = new TextDecoder('windows-1251');
             const text = decoder.decode(buffer);
+            console.log('Первые 100 символов декодированного текста:', text.substring(0, 100));
             
             console.log('Данные получены, обрабатываем CSV');
-            
-            // Парсим CSV
-            const rows = text.split('\n').map(row => row.split(';'));
-            const headers = rows[0];
-            drugsData = rows.slice(1)
-                .filter(row => row.length === headers.length)
-                .map(row => ({
-                    name: row[1] || '',
-                    trade_names: row[2] || '',
-                    classification: row[3] || '',
-                    mechanism: row[4] || '',
-                    indications: row[5] || '',
-                    side_effects: row[6] || '',
-                    contraindications: row[7] || '',
-                    interactions: row[8] || '',
-                    usage: row[9] || '',
-                    storage: row[12] || '',
-                    dog_dosage: row[13] || '',
-                    cat_dosage: row[14] || ''
-                }));
-            
+            drugsData = parseCSV(text);
             console.log('Данные успешно загружены, первый препарат:', drugsData[0]);
         } catch (error) {
             console.error('Ошибка при загрузке данных:', error);
@@ -83,6 +77,28 @@ document.addEventListener('DOMContentLoaded', () => {
             errorDiv.textContent = 'Ошибка при загрузке данных: ' + error.toString();
             errorDiv.style.display = 'block';
         }
+    }
+    
+    // Выносим парсинг CSV в отдельную функцию
+    function parseCSV(text) {
+        const rows = text.split('\n').map(row => row.split(';'));
+        const headers = rows[0];
+        return rows.slice(1)
+            .filter(row => row.length === headers.length)
+            .map(row => ({
+                name: row[1] || '',
+                trade_names: row[2] || '',
+                classification: row[3] || '',
+                mechanism: row[4] || '',
+                indications: row[5] || '',
+                side_effects: row[6] || '',
+                contraindications: row[7] || '',
+                interactions: row[8] || '',
+                usage: row[9] || '',
+                storage: row[12] || '',
+                dog_dosage: row[13] || '',
+                cat_dosage: row[14] || ''
+            }));
     }
     
     // Загружаем данные
