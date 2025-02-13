@@ -23,6 +23,32 @@
     --hover-bg-color: #2c2c2c;
     --checkbox-bg-color: #2c2c2c;
     --checkbox-border-color: #4d4d4d;
+    --text-color: var(--tg-theme-text-color, #ffffff);
+}
+
+.dark-theme .drug-name {
+    color: var(--tg-theme-button-color, #8774e1);
+}
+
+.dark-theme .drug-trade-names,
+.dark-theme .drug-classification,
+.dark-theme .drug-info,
+.dark-theme .categories-title,
+.dark-theme .category-text {
+    color: var(--text-color);
+}
+
+.dark-theme .drug-title {
+    color: var(--tg-theme-button-color, #8774e1);
+}
+
+.dark-theme .category-item {
+    background-color: var(--card-bg-color);
+    border-color: var(--card-border-color);
+}
+
+.dark-theme .category-item:hover {
+    background-color: var(--hover-bg-color);
 }
 
 body {
