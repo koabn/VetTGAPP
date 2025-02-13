@@ -29,11 +29,18 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Настраиваем тему в зависимости от темы Telegram
     function setThemeColors() {
+        // Получаем тему из Telegram
+        const isDarkTheme = tg.colorScheme === 'dark';
+        document.documentElement.classList.toggle('dark-theme', isDarkTheme);
+        
+        // Применяем цвета из Telegram
         document.documentElement.style.setProperty('--tg-theme-bg-color', tg.backgroundColor);
         document.documentElement.style.setProperty('--tg-theme-text-color', tg.textColor);
-        document.documentElement.style.setProperty('--tg-theme-button-color', tg.buttonColor || '#2a695a');
+        document.documentElement.style.setProperty('--tg-theme-hint-color', tg.hint_color || (isDarkTheme ? '#7d7d7d' : '#999999'));
+        document.documentElement.style.setProperty('--tg-theme-link-color', tg.linkColor || (isDarkTheme ? '#8774e1' : '#2481cc'));
+        document.documentElement.style.setProperty('--tg-theme-button-color', tg.buttonColor || (isDarkTheme ? '#8774e1' : '#2481cc'));
         document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.buttonTextColor || '#ffffff');
-        document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.secondaryBackgroundColor);
+        document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.secondaryBackgroundColor || (isDarkTheme ? '#232323' : '#f4f4f5'));
     }
     
     // Применяем тему
