@@ -43,35 +43,19 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadDrugsData() {
         try {
             console.log('Начинаем загрузку данных...');
-            // Используем путь относительно корня репозитория
-            const url = 'https://raw.githubusercontent.com/koabn/VetTGAPP/main/data/database.csv';
+            const url = `${API_BASE_URL}/api/search.json`;
             console.log('Загружаем данные с URL:', url);
             const response = await fetch(url);
             console.log('Статус ответа:', response.status);
+            const data = await response.json();
+            console.log('Данные получены:', data);
             
-            // Проверяем поддержку кодировки
-            try {
-                const testDecoder = new TextDecoder('windows-1251');
-                console.log('Кодировка windows-1251 поддерживается');
-            } catch (e) {
-                console.error('Кодировка windows-1251 не поддерживается:', e);
-                // Если windows-1251 не поддерживается, пробуем другие варианты
-                const text = await response.text();
-                console.log('Первые 100 символов текста:', text.substring(0, 100));
-                drugsData = parseCSV(text);
-                return;
+            if (data.status === 'success') {
+                drugsData = data.results;
+                console.log('Данные успешно загружены, первый препарат:', drugsData[0]);
+            } else {
+                console.error('Неверный формат данных:', data);
             }
-            
-            // Получаем данные как ArrayBuffer для правильной декодировки
-            const buffer = await response.arrayBuffer();
-            // Декодируем из Windows-1251
-            const decoder = new TextDecoder('windows-1251');
-            const text = decoder.decode(buffer);
-            console.log('Первые 100 символов декодированного текста:', text.substring(0, 100));
-            
-            console.log('Данные получены, обрабатываем CSV');
-            drugsData = parseCSV(text);
-            console.log('Данные успешно загружены, первый препарат:', drugsData[0]);
         } catch (error) {
             console.error('Ошибка при загрузке данных:', error);
             console.error('Полный текст ошибки:', error.toString());
