@@ -92,18 +92,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Обработчики для кнопок управления категориями
     selectAllBtn.addEventListener('click', () => {
         categoryCheckboxes.forEach(checkbox => checkbox.checked = true);
-        if (currentDrug) updateDrugInfo(currentDrug);
+        if (currentDrug) displayFilteredDrugInfo(currentDrug);
     });
     
     clearBtn.addEventListener('click', () => {
         categoryCheckboxes.forEach(checkbox => checkbox.checked = false);
-        if (currentDrug) updateDrugInfo(currentDrug);
+        if (currentDrug) displayFilteredDrugInfo(currentDrug);
     });
     
     // Обработчик изменения категорий
     categoryCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', () => {
-            if (currentDrug) updateDrugInfo(currentDrug);
+            if (currentDrug) displayFilteredDrugInfo(currentDrug);
         });
     });
     
