@@ -6,7 +6,7 @@
     --tg-theme-secondary-bg-color: #ffffff;
     --accent-color: var(--tg-theme-button-color, #2a695a);
     --accent-color-light: var(--tg-theme-button-color, #3d8a78);
-    --text-color: var(--tg-theme-text-color, #000000);
+    --text-color: var(--tg-theme-text-color, #ffffff);
     --border-radius: 12px;
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
