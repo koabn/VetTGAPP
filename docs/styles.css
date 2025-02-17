@@ -1,18 +1,13 @@
 :root {
-    --tg-theme-bg-color: #232323;
-    --tg-theme-text-color: #ffffff;
-    --tg-theme-button-color: #2a695a;
-    --tg-theme-button-text-color: #ffffff;
-    --tg-theme-secondary-bg-color: #2c2c2c;
     --accent-color: #2a695a;
     --accent-color-light: #3d8a78;
     --text-color: var(--tg-theme-text-color);
     --border-radius: 12px;
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    --card-bg-color: #2c2c2c;
+    --card-bg-color: var(--tg-theme-secondary-bg-color);
     --card-border-color: #383838;
     --hover-bg-color: #383838;
-    --checkbox-bg-color: #2c2c2c;
+    --checkbox-bg-color: var(--tg-theme-secondary-bg-color);
     --checkbox-border-color: #4d4d4d;
 }
 
