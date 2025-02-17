@@ -6,7 +6,7 @@
     --tg-theme-secondary-bg-color: #2c2c2c;
     --accent-color: #2a695a;
     --accent-color-light: #3d8a78;
-    --text-color: #ffffff;
+    --text-color: var(--tg-theme-text-color);
     --border-radius: 12px;
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     --card-bg-color: #2c2c2c;
