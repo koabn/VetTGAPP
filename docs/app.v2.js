@@ -38,11 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Применяем цвета из Telegram
         document.documentElement.style.setProperty('--tg-theme-bg-color', tg.backgroundColor);
         document.documentElement.style.setProperty('--tg-theme-text-color', tg.textColor);
-        document.documentElement.style.setProperty('--tg-theme-hint-color', tg.hint_color || (isDarkTheme ? '#7d7d7d' : '#999999'));
-        document.documentElement.style.setProperty('--tg-theme-link-color', tg.linkColor || (isDarkTheme ? '#8774e1' : '#2481cc'));
-        document.documentElement.style.setProperty('--tg-theme-button-color', tg.buttonColor || (isDarkTheme ? '#8774e1' : '#2481cc'));
-        document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.buttonTextColor || '#ffffff');
-        document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.secondaryBackgroundColor || (isDarkTheme ? '#232323' : '#f4f4f5'));
+        document.documentElement.style.setProperty('--tg-theme-hint-color', tg.hint_color);
+        document.documentElement.style.setProperty('--tg-theme-link-color', tg.linkColor);
+        document.documentElement.style.setProperty('--tg-theme-button-color', tg.buttonColor);
+        document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.buttonTextColor);
+        document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.secondaryBackgroundColor);
     }
     
     // Применяем тему
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Функция отображения вариантов препаратов
+    // Функция отображения вариантов выбора
     function showDrugOptions(results) {
         drugOptions.innerHTML = '';
         confirmationSection.style.display = 'block';
@@ -186,18 +186,13 @@ document.addEventListener('DOMContentLoaded', () => {
         results.forEach(item => {
             const option = document.createElement('div');
             option.className = 'drug-option';
+            if (item.type === 'symptom') {
+                option.classList.add('symptom-option');
+            }
             
             const nameSpan = document.createElement('span');
             nameSpan.className = 'drug-name';
-            
-            if (item.type === 'symptom') {
-                nameSpan.textContent = `🔍 ${item.name}`;
-                option.classList.add('symptom-option');
-            } else {
-                nameSpan.textContent = `💊 ${item.name}`;
-                option.classList.add('drug-option');
-            }
-            
+            nameSpan.textContent = item.type === 'symptom' ? `🔍 ${item.name}` : `💊 ${item.name}`;
             option.appendChild(nameSpan);
             
             if (!item.type && item.trade_names) {

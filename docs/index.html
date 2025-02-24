@@ -4,142 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vet App Тест</title>
-    <style>
-        /* Базовые стили */
-        :root {
-            --tg-theme-bg-color: #ffffff;
-            --tg-theme-text-color: #000000;
-            --tg-theme-hint-color: #999999;
-            --tg-theme-link-color: #2481cc;
-            --tg-theme-button-color: #2481cc;
-            --tg-theme-button-text-color: #ffffff;
-            --tg-theme-secondary-bg-color: #f4f4f5;
-        }
-
-        body {
-            background-color: var(--tg-theme-bg-color);
-            color: var(--tg-theme-text-color);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 16px;
-        }
-
-        .search-container {
-            margin-bottom: 16px;
-        }
-
-        #searchInput {
-            width: calc(100% - 24px);
-            padding: 8px;
-            margin-bottom: 8px;
-            border: 1px solid var(--tg-theme-hint-color);
-            border-radius: 8px;
-        }
-
-        .search-button {
-            background-color: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .drug-option {
-            padding: 12px;
-            margin: 8px 0;
-            background-color: var(--tg-theme-secondary-bg-color);
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .drug-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 16px;
-        }
-
-        .drug-info {
-            line-height: 1.5;
-        }
-
-        #error {
-            color: red;
-            display: none;
-            margin: 8px 0;
-        }
-
-        .category-filters {
-            margin: 16px 0;
-            padding: 8px;
-            background-color: var(--tg-theme-secondary-bg-color);
-            border-radius: 8px;
-        }
-
-        .category-filters label {
-            display: block;
-            margin: 4px 0;
-        }
-
-        .symptom-option {
-            background-color: var(--tg-theme-secondary-bg-color);
-        }
-
-        .report-error-btn {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            background-color: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
-            border: none;
-            padding: 8px;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-        }
-
-        .report-error-btn:hover {
-            opacity: 0.9;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div id="app">
+        <div class="container">
+            <div class="search-section">
+                <input type="text" id="searchInput" placeholder="Введите название препарата..." class="search-input">
+                <button class="search-button">Найти</button>
+            </div>
+
+            <div id="confirmation-section" class="confirmation-section" style="display: none;">
+                <div class="confirmation-title">Выберите препарат:</div>
+                <div id="drug-options" class="drug-options"></div>
+            </div>
+
+            <div id="results" class="results-section">
+                <div id="drug-info" class="drug-info-container" style="display: none;">
+                    <div class="categories-section">
+                        <div class="categories-title">Выберите категории информации:</div>
+                        <div class="categories-grid">
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="mechanism" checked>
+                                <span class="category-text">⚡ Механизм действия</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="indications" checked>
+                                <span class="category-text">🎯 Показания</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="side_effects" checked>
+                                <span class="category-text">⚕️ Побочные эффекты</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="contraindications" checked>
+                                <span class="category-text">⚠️ Противопоказания</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="interactions" checked>
+                                <span class="category-text">🔄 Взаимодействия</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="usage" checked>
+                                <span class="category-text">💉 Применение</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="storage" checked>
+                                <span class="category-text">🏠 Хранение</span>
+                            </label>
+                            <label class="category-item">
+                                <input type="checkbox" name="category" value="dosage" checked>
+                                <span class="category-text">💊 Дозировка</span>
+                            </label>
+                        </div>
+                        <div class="categories-controls">
+                            <button id="selectAllCategories" class="control-button">Выбрать все</button>
+                            <button id="clearCategories" class="control-button">Очистить</button>
+                        </div>
+                    </div>
+                    <div id="drug-content"></div>
+                </div>
+            </div>
+            <div id="error" class="error-message"></div>
+        </div>
+    </div>
+
     <button class="report-error-btn" id="reportError" title="Сообщить об ошибке">⚠️</button>
-    
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Поиск препарата или симптома...">
-        <button class="search-button">Поиск</button>
-    </div>
-
-    <div class="category-filters">
-        <button id="selectAllCategories">Выбрать все</button>
-        <button id="clearCategories">Очистить</button>
-        <label><input type="checkbox" name="category" value="mechanism" checked> Механизм действия</label>
-        <label><input type="checkbox" name="category" value="indications" checked> Показания</label>
-        <label><input type="checkbox" name="category" value="side_effects" checked> Побочные эффекты</label>
-        <label><input type="checkbox" name="category" value="contraindications" checked> Противопоказания</label>
-        <label><input type="checkbox" name="category" value="interactions" checked> Взаимодействия</label>
-        <label><input type="checkbox" name="category" value="usage" checked> Применение</label>
-        <label><input type="checkbox" name="category" value="storage" checked> Хранение</label>
-        <label><input type="checkbox" name="category" value="dosage" checked> Дозировка</label>
-    </div>
-
-    <div id="error"></div>
-
-    <div id="confirmation-section" style="display: none;">
-        <div id="drug-options"></div>
-    </div>
-
-    <div id="drug-info" style="display: none;">
-        <div id="drug-content"></div>
-    </div>
 
     <!-- Эмуляция Telegram WebApp для локального тестирования -->
     <script>
@@ -150,12 +80,12 @@
                 MainButton: {
                     hide: () => {}
                 },
-                colorScheme: 'light',
-                backgroundColor: '#ffffff',
-                textColor: '#000000',
-                buttonColor: '#2481cc',
+                colorScheme: 'dark',
+                backgroundColor: '#232323',
+                textColor: '#ffffff',
+                buttonColor: '#2a695a',
                 buttonTextColor: '#ffffff',
-                secondaryBackgroundColor: '#f4f4f5'
+                secondaryBackgroundColor: '#2c2c2c'
             }
         };
     </script>
