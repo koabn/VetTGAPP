@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearBtn = document.getElementById('clearCategories');
     const categoryCheckboxes = document.querySelectorAll('input[name="category"]');
     const searchButton = document.querySelector('.search-button');
+    const reportErrorBtn = document.getElementById('reportError');
     
     let currentDrug = null;
     let drugsData = null;
@@ -314,6 +315,49 @@ document.addEventListener('DOMContentLoaded', () => {
         info.innerHTML = content.join('<br><br>');
         drugContent.appendChild(info);
     }
+
+    // Функция для отправки сообщения об ошибке
+    function reportError() {
+        let errorMessage = '';
+        
+        // Добавляем информацию о времени
+        const now = new Date();
+        errorMessage += `📅 Дата: ${now.toLocaleDateString()}\n`;
+        errorMessage += `⏰ Время: ${now.toLocaleTimeString()}\n\n`;
+        
+        // Добавляем информацию о пользователе, если доступна
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            const user = tg.initDataUnsafe.user;
+            errorMessage += `👤 Пользователь: ${user.username || 'Не указан'}\n`;
+            errorMessage += `🆔 ID: ${user.id || 'Не доступен'}\n\n`;
+        }
+        
+        // Если открыт препарат или симптом, добавляем информацию о нём
+        if (currentDrug) {
+            errorMessage += `📋 Контекст: ${currentDrug.type === 'symptom' ? 'Симптом' : 'Препарат'}\n`;
+            errorMessage += `📌 Название: ${currentDrug.name}\n\n`;
+        }
+        
+        // Открываем нативный диалог Telegram
+        tg.showPopup({
+            title: 'Сообщить об ошибке',
+            message: 'Пожалуйста, опишите найденную ошибку:',
+            buttons: [
+                {id: "send", type: "ok", text: "Отправить"},
+                {type: "cancel"}
+            ]
+        }, function(buttonId) {
+            if (buttonId === "send") {
+                // Открываем группу для сообщений об ошибках
+                const groupUrl = 'https://t.me/+f9s71e-79dgyOTQy';
+                const text = encodeURIComponent(`🚨 Сообщение об ошибке\n\n${errorMessage}`);
+                window.open(`${groupUrl}?text=${text}`);
+            }
+        });
+    }
+
+    // Добавляем обработчик для кнопки сообщения об ошибке
+    reportErrorBtn.addEventListener('click', reportError);
 
     // Загружаем данные при инициализации
     loadDrugsData();
