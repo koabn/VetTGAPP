@@ -355,10 +355,10 @@ document.addEventListener('DOMContentLoaded', () => {
             ]
         }, function(buttonId) {
             if (buttonId === "send") {
-                // Открываем группу для сообщений об ошибках
+                // Используем Telegram WebApp для открытия ссылки
                 const groupUrl = 'https://t.me/+f9s71e-79dgyOTQy';
                 const text = encodeURIComponent(`🚨 Сообщение об ошибке\n\n${errorMessage}`);
-                window.open(`${groupUrl}?text=${text}`);
+                tg.openTelegramLink(`${groupUrl}?text=${text}`);
             }
         });
     }
