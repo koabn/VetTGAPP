@@ -52,12 +52,17 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadDrugsData() {
         try {
             console.log('Начинаем загрузку данных...');
+            console.log('URL для drugs:', `${API_BASE_URL}/api/drugs.json`);
+            console.log('URL для symptoms:', `${API_BASE_URL}/api/symptoms.json`);
             
             // Загружаем оба файла параллельно
             const [drugsResponse, symptomsResponse] = await Promise.all([
                 fetch(`${API_BASE_URL}/api/drugs.json`),
                 fetch(`${API_BASE_URL}/api/symptoms.json`)
             ]);
+            
+            console.log('Статус ответа drugs:', drugsResponse.status);
+            console.log('Статус ответа symptoms:', symptomsResponse.status);
             
             if (!drugsResponse.ok || !symptomsResponse.ok) {
                 throw new Error('Ошибка при загрузке данных');
@@ -68,10 +73,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 symptomsResponse.json()
             ]);
             
-            drugsData = drugsJson;
+            console.log('Данные drugs получены:', !!drugsJson);
+            console.log('Данные symptoms получены:', !!symptomsJson);
+            
+            // Проверяем структуру данных
+            if (Array.isArray(drugsJson)) {
+                drugsData = drugsJson;
+            } else if (drugsJson && drugsJson.results) {
+                drugsData = drugsJson.results;
+            } else {
+                throw new Error('Неверный формат данных препаратов');
+            }
+            
             symptomsData = symptomsJson;
             
             console.log('Данные успешно загружены');
+            console.log('Количество препаратов:', drugsData.length);
+            console.log('Количество симптомов:', Object.keys(symptomsData).length);
             
         } catch (error) {
             console.error('Ошибка при загрузке данных:', error);
@@ -149,14 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Поиск по симптомам
         const symptomResults = Object.entries(symptomsData)
-            .filter(([symptom, data]) => {
-                return symptom.toLowerCase().includes(query) ||
-                       data.sections.some(section => 
-                           section.title.toLowerCase().includes(query) ||
-                           (section.description && section.description.some(desc => 
-                               desc.toLowerCase().includes(query)
-                           ))
-                       );
+            .filter(([symptom]) => {
+                return symptom.toLowerCase().includes(query);
             })
             .map(([symptom, data]) => ({
                 name: symptom,
