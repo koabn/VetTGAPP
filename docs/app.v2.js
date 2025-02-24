@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (isHeader) {
                         sectionContent += `<div class="subsection-header">${desc}</div>`;
                     } else {
-                        sectionContent += `<div class="description-item">• ${desc}</div>`;
+                        sectionContent += `<div class="description-item">${desc}</div>`;
                     }
                 });
                 sectionContent += '</div>';
