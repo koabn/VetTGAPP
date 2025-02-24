@@ -313,14 +313,18 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const content = symptom.sections.map(section => {
             let sectionContent = `<div class="section-content">`;
-            sectionContent += `<div class="section-title">🔹 ${section.title}</div>`;
+            sectionContent += `<div class="section-title">${section.title}</div>`;
             if (section.description && section.description.length > 0) {
-                sectionContent += `<div class="section-description">${section.description.map(desc => {
-                    if (desc.toUpperCase() === desc && desc.length > 3) {
-                        return `<div class="subsection-header">${desc}</div>`;
+                sectionContent += `<div class="section-description">`;
+                section.description.forEach(desc => {
+                    const isHeader = desc === desc.toUpperCase() && desc.length > 3;
+                    if (isHeader) {
+                        sectionContent += `<div class="subsection-header">${desc}</div>`;
+                    } else {
+                        sectionContent += `<div class="description-item">• ${desc}</div>`;
                     }
-                    return `<div class="description-item">• ${desc}</div>`;
-                }).join('')}</div>`;
+                });
+                sectionContent += '</div>';
             }
             sectionContent += '</div>';
             return sectionContent;
