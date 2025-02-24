@@ -167,8 +167,24 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Поиск по симптомам
         const symptomResults = Object.entries(symptomsData)
-            .filter(([symptom]) => {
-                return symptom.toLowerCase().includes(query);
+            .filter(([symptom, data]) => {
+                // Поиск по названию симптома
+                if (symptom.toLowerCase().includes(query)) {
+                    return true;
+                }
+                
+                // Поиск по содержимому секций
+                return data.sections.some(section => {
+                    // Поиск в заголовке секции
+                    if (section.title.toLowerCase().includes(query)) {
+                        return true;
+                    }
+                    
+                    // Поиск в описаниях
+                    return section.description.some(desc => 
+                        desc.toLowerCase().includes(query)
+                    );
+                });
             })
             .map(([symptom, data]) => ({
                 name: symptom,
