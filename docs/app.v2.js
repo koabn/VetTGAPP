@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let currentDrug = null;
     let drugsData = null;
+    let symptomsData = null;
     
     // Настраиваем тему в зависимости от темы Telegram
     function setThemeColors() {
@@ -50,51 +51,33 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadDrugsData() {
         try {
             console.log('Начинаем загрузку данных...');
-            const url = `${API_BASE_URL}/api/search.json`;
-            console.log('Загружаем данные с URL:', url);
-            const response = await fetch(url);
-            console.log('Статус ответа:', response.status);
-            const data = await response.json();
-            console.log('Данные получены:', data);
             
-            if (data.status === 'success') {
-                drugsData = data.results;
-                console.log('Данные успешно загружены, первый препарат:', drugsData[0]);
-            } else {
-                console.error('Неверный формат данных:', data);
+            // Загружаем оба файла параллельно
+            const [drugsResponse, symptomsResponse] = await Promise.all([
+                fetch(`${API_BASE_URL}/api/drugs.json`),
+                fetch(`${API_BASE_URL}/api/symptoms.json`)
+            ]);
+            
+            if (!drugsResponse.ok || !symptomsResponse.ok) {
+                throw new Error('Ошибка при загрузке данных');
             }
+
+            const [drugsJson, symptomsJson] = await Promise.all([
+                drugsResponse.json(),
+                symptomsResponse.json()
+            ]);
+            
+            drugsData = drugsJson;
+            symptomsData = symptomsJson;
+            
+            console.log('Данные успешно загружены');
+            
         } catch (error) {
             console.error('Ошибка при загрузке данных:', error);
-            console.error('Полный текст ошибки:', error.toString());
             errorDiv.textContent = 'Ошибка при загрузке данных: ' + error.toString();
             errorDiv.style.display = 'block';
         }
     }
-    
-    // Выносим парсинг CSV в отдельную функцию
-    function parseCSV(text) {
-        const rows = text.split('\n').map(row => row.split(';'));
-        const headers = rows[0];
-        return rows.slice(1)
-            .filter(row => row.length === headers.length)
-            .map(row => ({
-                name: row[1] || '',
-                trade_names: row[2] || '',
-                classification: row[3] || '',
-                mechanism: row[4] || '',
-                indications: row[5] || '',
-                side_effects: row[6] || '',
-                contraindications: row[7] || '',
-                interactions: row[8] || '',
-                usage: row[9] || '',
-                storage: row[12] || '',
-                dog_dosage: row[13] || '',
-                cat_dosage: row[14] || ''
-            }));
-    }
-    
-    // Загружаем данные
-    loadDrugsData();
     
     // Обработчики для кнопок управления категориями
     selectAllBtn.addEventListener('click', () => {
@@ -150,30 +133,43 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Функция поиска препаратов
     function searchDrugs(query) {
-        console.log('Начинаем поиск по запросу:', query);
-        console.log('Состояние drugsData:', drugsData);
-        
-        if (!drugsData) {
-            console.log('drugsData не загружены');
+        if (!drugsData || !symptomsData) {
             errorDiv.textContent = 'Данные еще не загружены';
             errorDiv.style.display = 'block';
             return;
         }
         
-        const results = drugsData.filter(drug => {
+        // Поиск по препаратам
+        const drugResults = drugsData.filter(drug => {
             const nameMatch = drug.name.toLowerCase().includes(query);
             const tradeMatch = drug.trade_names && drug.trade_names.toLowerCase().includes(query);
-            console.log(`Проверяем препарат ${drug.name}:`, { nameMatch, tradeMatch });
             return nameMatch || tradeMatch;
         });
         
-        console.log('Результаты поиска:', results);
+        // Поиск по симптомам
+        const symptomResults = Object.entries(symptomsData)
+            .filter(([symptom, data]) => {
+                return symptom.toLowerCase().includes(query) ||
+                       data.sections.some(section => 
+                           section.title.toLowerCase().includes(query) ||
+                           (section.description && section.description.some(desc => 
+                               desc.toLowerCase().includes(query)
+                           ))
+                       );
+            })
+            .map(([symptom, data]) => ({
+                name: symptom,
+                type: 'symptom',
+                sections: data.sections
+            }));
         
-        if (results.length > 0) {
-            showDrugOptions(results);
+        const allResults = [...drugResults, ...symptomResults];
+        
+        if (allResults.length > 0) {
+            showDrugOptions(allResults);
             errorDiv.style.display = 'none';
         } else {
-            errorDiv.textContent = 'Препараты не найдены';
+            errorDiv.textContent = 'Ничего не найдено';
             errorDiv.style.display = 'block';
             confirmationSection.style.display = 'none';
             drugInfo.style.display = 'none';
@@ -181,39 +177,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Функция отображения вариантов препаратов
-    function showDrugOptions(drugs) {
+    function showDrugOptions(results) {
         drugOptions.innerHTML = '';
         confirmationSection.style.display = 'block';
         drugInfo.style.display = 'none';
         
-        drugs.forEach(drug => {
+        results.forEach(item => {
             const option = document.createElement('div');
             option.className = 'drug-option';
             
             const nameSpan = document.createElement('span');
             nameSpan.className = 'drug-name';
-            nameSpan.textContent = drug.name;
+            
+            if (item.type === 'symptom') {
+                nameSpan.textContent = `🔍 ${item.name}`;
+                option.classList.add('symptom-option');
+            } else {
+                nameSpan.textContent = `💊 ${item.name}`;
+                option.classList.add('drug-option');
+            }
+            
             option.appendChild(nameSpan);
             
-            if (drug.trade_names) {
+            if (!item.type && item.trade_names) {
                 const tradeSpan = document.createElement('span');
                 tradeSpan.className = 'drug-trade-names';
-                tradeSpan.textContent = ` (${drug.trade_names})`;
+                tradeSpan.textContent = ` (${item.trade_names})`;
                 option.appendChild(tradeSpan);
             }
             
-            if (drug.classification) {
-                const classSpan = document.createElement('div');
-                classSpan.className = 'drug-classification';
-                classSpan.textContent = drug.classification;
-                option.appendChild(classSpan);
-            }
-            
             option.addEventListener('click', () => {
-                currentDrug = drug;
+                currentDrug = item;
                 confirmationSection.style.display = 'none';
                 drugInfo.style.display = 'block';
-                displayFilteredDrugInfo(drug);
+                if (item.type === 'symptom') {
+                    displaySymptomInfo(item);
+                } else {
+                    displayFilteredDrugInfo(item);
+                }
             });
             
             drugOptions.appendChild(option);
@@ -289,4 +290,31 @@ document.addEventListener('DOMContentLoaded', () => {
         info.innerHTML = content.join('<br><br>');
         drugContent.appendChild(info);
     }
-}); 
+
+    // Добавляем новую функцию для отображения информации о симптоме
+    function displaySymptomInfo(symptom) {
+        drugContent.innerHTML = '';
+        
+        const title = document.createElement('div');
+        title.className = 'drug-title';
+        title.textContent = symptom.name;
+        drugContent.appendChild(title);
+        
+        const info = document.createElement('div');
+        info.className = 'drug-info';
+        
+        const content = symptom.sections.map(section => {
+            let sectionContent = `🔹 ${section.title}`;
+            if (section.description && section.description.length > 0) {
+                sectionContent += `\n${section.description.join('\n')}`;
+            }
+            return sectionContent;
+        });
+        
+        info.innerHTML = content.join('<br><br>');
+        drugContent.appendChild(info);
+    }
+
+    // Загружаем данные при инициализации
+    loadDrugsData();
+});
