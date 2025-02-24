@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = symptom.sections.map(section => {
             let sectionContent = `🔹 ${section.title}`;
             if (section.description && section.description.length > 0) {
-                sectionContent += `\n${section.description.join('\n')}`;
+                sectionContent += `\n${section.description.map(desc => `  • ${desc}`).join('\n')}`;
             }
             return sectionContent;
         });
