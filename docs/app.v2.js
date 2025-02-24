@@ -312,14 +312,21 @@ document.addEventListener('DOMContentLoaded', () => {
         info.className = 'drug-info';
         
         const content = symptom.sections.map(section => {
-            let sectionContent = `🔹 ${section.title}`;
+            let sectionContent = `<div class="section-content">`;
+            sectionContent += `<div class="section-title">🔹 ${section.title}</div>`;
             if (section.description && section.description.length > 0) {
-                sectionContent += `\n${section.description.map(desc => `  • ${desc}`).join('\n')}`;
+                sectionContent += `<div class="section-description">${section.description.map(desc => {
+                    if (desc.toUpperCase() === desc && desc.length > 3) {
+                        return `<div class="subsection-header">${desc}</div>`;
+                    }
+                    return `<div class="description-item">• ${desc}</div>`;
+                }).join('')}</div>`;
             }
+            sectionContent += '</div>';
             return sectionContent;
         });
         
-        info.innerHTML = content.join('<br><br>');
+        info.innerHTML = content.join('');
         drugContent.appendChild(info);
     }
 

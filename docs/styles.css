@@ -307,4 +307,32 @@ button:hover {
 .category-text,
 .confirmation-title {
     color: var(--text-color);
+}
+
+/* Стили для секций симптомов */
+.section-content {
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--tg-theme-button-color);
+}
+
+.section-description {
+    margin-left: 20px;
+}
+
+.subsection-header {
+    color: var(--tg-theme-link-color);
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.description-item {
+    margin-left: 15px;
+    margin-bottom: 5px;
+    line-height: 1.4;
 } 
