@@ -351,43 +351,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Функция для отправки сообщения об ошибке
-    function reportError() {
-        let errorMessage = '';
-        
-        // Добавляем информацию о времени
-        const now = new Date();
-        errorMessage += `📅 Дата: ${now.toLocaleDateString()}\n`;
-        errorMessage += `⏰ Время: ${now.toLocaleTimeString()}\n\n`;
-        
-        // Добавляем информацию о пользователе, если доступна
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            errorMessage += `👤 Пользователь: ${user.username || 'Не указан'}\n`;
-            errorMessage += `🆔 ID: ${user.id || 'Не доступен'}\n\n`;
-        }
-        
-        // Если открыт препарат или симптом, добавляем информацию о нём
-        if (currentDrug) {
-            errorMessage += `📋 Контекст: ${currentDrug.type === 'symptom' ? 'Симптом' : 'Препарат'}\n`;
-            errorMessage += `📌 Название: ${currentDrug.name}\n\n`;
-        }
+    async function reportError() {
+        let errorData = {
+            date: new Date().toLocaleString(),
+            user: tg.initDataUnsafe?.user?.username || 'Не указан',
+            userId: tg.initDataUnsafe?.user?.id || 'Не доступен',
+            context: currentDrug ? `${currentDrug.type === 'symptom' ? 'Симптом' : 'Препарат'}: ${currentDrug.name}` : 'Нет контекста'
+        };
 
-        // Формируем URL для отправки сообщения
-        const groupUrl = 'https://t.me/+f9s71e-79dgyOTQy';
-        const text = encodeURIComponent(`🚨 Сообщение об ошибке\n\n${errorMessage}`);
-        
         try {
-            // Сначала пробуем использовать Telegram WebApp API
-            if (tg.openTelegramLink) {
-                tg.openTelegramLink(`${groupUrl}?text=${text}`);
-            } else {
-                // Если метод недоступен, используем обычное открытие ссылки
-                window.open(`${groupUrl}?text=${text}`, '_blank');
-            }
+            const url = 'https://script.google.com/macros/s/AKfycbwzMBxTmgfXH-nh-HgIggE_ZltMPT9Ovw1ovMyrWgl8RwQX7DKisA3Iz4XDSeuzyCs0/exec';
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(errorData)
+            });
+
+            // Показываем уведомление пользователю
+            tg.showAlert('Спасибо! Сообщение об ошибке отправлено.');
+            
         } catch (error) {
-            console.error('Ошибка при открытии ссылки:', error);
-            // Запасной вариант
-            window.location.href = `${groupUrl}?text=${text}`;
+            console.error('Ошибка при отправке сообщения:', error);
+            tg.showAlert('Извините, не удалось отправить сообщение об ошибке.');
         }
     }
 
