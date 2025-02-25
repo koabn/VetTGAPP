@@ -5,6 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Сообщаем Telegram, что приложение готово
     tg.ready();
     
+    // Логируем данные пользователя при запуске
+    console.log('Telegram WebApp данные:', {
+        initData: tg.initData,
+        initDataUnsafe: tg.initDataUnsafe,
+        version: tg.version,
+        platform: tg.platform
+    });
+    
     // Настраиваем основной цвет и тему
     tg.setHeaderColor('secondary_bg_color');
     tg.MainButton.hide();
@@ -362,12 +370,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функция для отправки сообщения об ошибке
     async function reportError() {
+        // Получаем данные пользователя
+        const initData = tg.initData || '';
+        let userData;
+        try {
+            userData = JSON.parse(initData);
+        } catch (e) {
+            console.log('Ошибка парсинга initData:', e);
+            userData = null;
+        }
+
         let errorData = {
             date: new Date().toLocaleString(),
-            user: tg.initDataUnsafe?.user?.username || 'Не указан',
-            userId: tg.initDataUnsafe?.user?.id || 'Не доступен',
+            user: userData?.user?.username || tg.initDataUnsafe?.user?.username || 'Не указан',
+            userId: userData?.user?.id || tg.initDataUnsafe?.user?.id || 'Не доступен',
             context: currentDrug ? `${currentDrug.type === 'symptom' ? 'Симптом' : 'Препарат'}: ${currentDrug.name}` : 'Нет контекста'
         };
+
+        console.log('Отправляемые данные:', errorData);
 
         try {
             const url = 'https://script.google.com/macros/s/AKfycbwzMBxTmgfXH-nh-HgIggE_ZltMPT9Ovw1ovMyrWgl8RwQX7DKisA3Iz4XDSeuzyCs0/exec';
