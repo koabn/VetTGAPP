@@ -371,22 +371,24 @@ document.addEventListener('DOMContentLoaded', () => {
             errorMessage += `📋 Контекст: ${currentDrug.type === 'symptom' ? 'Симптом' : 'Препарат'}\n`;
             errorMessage += `📌 Название: ${currentDrug.name}\n\n`;
         }
+
+        // Формируем URL для отправки сообщения
+        const groupUrl = 'https://t.me/+f9s71e-79dgyOTQy';
+        const text = encodeURIComponent(`🚨 Сообщение об ошибке\n\n${errorMessage}`);
         
-        // Открываем нативный диалог Telegram
-        tg.showPopup({
-            title: 'Сообщить об ошибке',
-            message: 'Пожалуйста, опишите найденную ошибку:',
-            buttons: [
-                {id: "send", type: "ok", text: "Отправить"},
-                {type: "cancel"}
-            ]
-        }, function(buttonId) {
-            if (buttonId === "send") {
-                const groupUrl = 'https://t.me/+f9s71e-79dgyOTQy';
-                const text = encodeURIComponent(`🚨 Сообщение об ошибке\n\n${errorMessage}`);
-                tg.openLink(`${groupUrl}?text=${text}`);
+        try {
+            // Сначала пробуем использовать Telegram WebApp API
+            if (tg.openTelegramLink) {
+                tg.openTelegramLink(`${groupUrl}?text=${text}`);
+            } else {
+                // Если метод недоступен, используем обычное открытие ссылки
+                window.open(`${groupUrl}?text=${text}`, '_blank');
             }
-        });
+        } catch (error) {
+            console.error('Ошибка при открытии ссылки:', error);
+            // Запасной вариант
+            window.location.href = `${groupUrl}?text=${text}`;
+        }
     }
 
     // Добавляем обработчик для кнопки сообщения об ошибке
