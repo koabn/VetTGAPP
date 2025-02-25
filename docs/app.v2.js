@@ -382,16 +382,20 @@ document.addEventListener('DOMContentLoaded', () => {
             ]
         }, function(buttonId) {
             if (buttonId === "send") {
-                // Используем Telegram WebApp для открытия ссылки
                 const groupUrl = 'https://t.me/+f9s71e-79dgyOTQy';
                 const text = encodeURIComponent(`🚨 Сообщение об ошибке\n\n${errorMessage}`);
-                tg.openTelegramLink(`${groupUrl}?text=${text}`);
+                tg.openLink(`${groupUrl}?text=${text}`);
             }
         });
     }
 
     // Добавляем обработчик для кнопки сообщения об ошибке
-    reportErrorBtn.addEventListener('click', reportError);
+    if (reportErrorBtn) {
+        reportErrorBtn.addEventListener('click', reportError);
+        console.log('Обработчик для кнопки сообщения об ошибке добавлен');
+    } else {
+        console.error('Кнопка reportError не найдена в DOM');
+    }
 
     // Загружаем данные при инициализации
     loadDrugsData();
