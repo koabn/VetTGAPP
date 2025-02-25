@@ -313,6 +313,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         info.innerHTML = content.join('<br><br>');
         drugContent.appendChild(info);
+
+        // Добавляем текст на кнопку сообщения об ошибке
+        if (reportErrorBtn) {
+            reportErrorBtn.textContent = '⚠️ Сообщить об ошибке';
+        }
     }
 
     // Добавляем новую функцию для отображения информации о симптоме
@@ -348,6 +353,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         info.innerHTML = content.join('');
         drugContent.appendChild(info);
+
+        // Добавляем текст на кнопку сообщения об ошибке
+        if (reportErrorBtn) {
+            reportErrorBtn.textContent = '⚠️ Сообщить об ошибке';
+        }
     }
 
     // Функция для отправки сообщения об ошибке
@@ -371,7 +381,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(errorData)
             });
 
-            // Показываем уведомление пользователю
+            // Создаем и показываем уведомление
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = 'Спасибо! Сообщение об ошибке отправлено.';
+            document.body.appendChild(notification);
+
+            // Показываем уведомление
+            setTimeout(() => notification.classList.add('show'), 100);
+
+            // Скрываем и удаляем через 3 секунды
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+
+            // Показываем уведомление в Telegram
             tg.showAlert('Спасибо! Сообщение об ошибке отправлено.');
             
         } catch (error) {
