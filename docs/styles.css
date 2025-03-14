@@ -274,41 +274,33 @@ button:hover {
 }
 
 .drug-info-container {
-    background-color: var(--secondary-bg-color);
-    border-radius: var(--border-radius);
-    padding: 20px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border-color);
     animation: slideUp 0.4s ease;
 }
 
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
 .categories-section {
-    background-color: var(--bg-color);
+    background-color: var(--secondary-bg-color);
     border-radius: var(--border-radius);
     padding: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border-color);
+    animation: slideUp 0.4s ease;
+    max-width: 100%;
 }
 
 .categories-title {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     color: var(--text-color);
 }
 
 .categories-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
-    margin-bottom: 20px;
-    padding: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 12px;
     background: var(--glass-effect);
     border-radius: var(--border-radius);
     backdrop-filter: blur(10px);
@@ -318,10 +310,10 @@ button:hover {
     background: var(--secondary-bg-color);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-medium);
-    padding: 16px;
+    padding: 10px 12px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     transition: all 0.3s ease;
     box-shadow: var(--shadow-light);
 }
@@ -342,164 +334,26 @@ button:hover {
 }
 
 .category-text {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--text-color);
     opacity: 0.9;
     transition: opacity 0.2s ease;
     flex: 1;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
 }
 
 .category-item:hover .category-text {
     opacity: 1;
 }
 
-#drug-content {
-    padding-top: 20px;
-}
-
-.categories-controls {
-    display: flex;
-    gap: 12px;
-    margin-top: 16px;
-}
-
-.control-button {
-    flex: 1;
-    padding: 10px;
-    font-size: 14px;
-    background-color: var(--accent-color);
-    color: var(--text-color);
-    border: none;
-    border-radius: var(--border-radius-medium);
-    cursor: pointer;
-    transition: var(--transition-default);
-}
-
-.control-button:hover {
-    background-color: var(--accent-color-light);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-hover);
-}
-
-.drug-trade-names,
-.drug-classification,
-.drug-info,
-.categories-title,
-.category-text,
-.confirmation-title {
-    color: var(--text-color);
-}
-
-/* Стили для секций симптомов */
-.section-content {
-    margin-bottom: 24px;
-    animation: fadeIn 0.4s ease;
-    animation-fill-mode: both;
-}
-
-.section-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 16px;
+input[type="checkbox"]:checked + .category-text {
     color: var(--accent-color);
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    letter-spacing: 0.5px;
-}
-
-.section-title::before {
-    content: "";
-    width: 4px;
-    height: 24px;
-    background: var(--accent-color);
-    border-radius: 2px;
-}
-
-.section-description {
-    margin-left: 20px;
-}
-
-.subsection-header {
-    color: var(--accent-color-light);
-    font-weight: bold;
-    margin-top: 16px;
-    margin-bottom: 8px;
-    font-size: 16px;
-}
-
-.description-item {
-    margin-left: 15px;
-    margin-bottom: 8px;
-    line-height: 1.5;
-    color: var(--text-color);
-    opacity: var(--text-opacity-high);
-    position: relative;
-    padding-left: 20px;
-}
-
-.description-item::before {
-    content: "•";
-    position: absolute;
-    left: 0;
-    color: var(--accent-color);
-}
-
-.notification {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--accent-color);
-    color: var(--text-color);
-    padding: 12px 24px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    text-align: center;
-    font-weight: 500;
-    animation: slideUp 0.3s ease;
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-effect);
-}
-
-.notification.show {
-    opacity: 1;
-}
-
-.report-error-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: auto !important;
-    margin: 0 !important;
-    padding: 12px 20px !important;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    z-index: 1000;
-    background-color: var(--error-bg-color);
-    color: var(--error-color);
-    border: 1px solid var(--error-border-color);
-    opacity: 0.9;
-}
-
-.report-error-btn::after {
-    content: "Сообщить об ошибке";
-    font-weight: normal;
-}
-
-.report-error-btn:hover {
-    opacity: 1;
-    transform: translateY(-2px);
-    background-color: var(--error-bg-color);
-    color: var(--error-color);
+    font-weight: 600;
 }
 
 @media (max-width: 768px) {
@@ -513,26 +367,50 @@ button:hover {
         top: 0;
     }
 
+    .categories-section {
+        padding: 8px;
+        margin-bottom: 8px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .categories-title {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
     .categories-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        padding: 12px;
-        gap: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding: 4px;
+        gap: 4px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .category-item {
-        padding: 12px;
-        gap: 12px;
+        padding: 4px 6px;
+        gap: 6px;
+        min-height: 36px;
+        align-items: flex-start;
     }
 
     .category-text {
-        font-size: 14px;
+        font-size: 11px;
+        line-height: 1.3;
+        padding-top: 2px;
+        word-wrap: break-word;
+        word-break: break-word;
+        hyphens: auto;
+        -webkit-hyphens: auto;
+        -ms-hyphens: auto;
     }
 
-    .report-error-btn {
-        bottom: 16px;
-        right: 16px;
-        font-size: 13px;
-        padding: 10px 16px !important;
+    input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        min-width: 16px;
+        margin-top: 2px;
     }
 }
 
