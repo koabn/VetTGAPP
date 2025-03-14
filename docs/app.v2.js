@@ -5,7 +5,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Сообщаем Telegram, что приложение готово
     tg.ready();
     
-    // Логируем данные пользователя при запуске
+    // Подробное логирование данных пользователя
+    console.log('Данные пользователя из initDataUnsafe:', {
+        user: tg.initDataUnsafe?.user,
+        username: tg.initDataUnsafe?.user?.username,
+        firstName: tg.initDataUnsafe?.user?.first_name,
+        lastName: tg.initDataUnsafe?.user?.last_name,
+        id: tg.initDataUnsafe?.user?.id,
+        isBot: tg.initDataUnsafe?.user?.is_bot,
+        languageCode: tg.initDataUnsafe?.user?.language_code
+    });
+    
+    // Логируем все доступные данные WebApp
+    console.log('Все данные WebApp:', {
+        platform: tg.platform,
+        version: tg.version,
+        viewportHeight: tg.viewportHeight,
+        viewportStableHeight: tg.viewportStableHeight,
+        isExpanded: tg.isExpanded,
+        colorScheme: tg.colorScheme
+    });
+    
+    // Оригинальное логирование
     console.log('Telegram WebApp данные:', {
         initData: tg.initData,
         initDataUnsafe: tg.initDataUnsafe,
@@ -32,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoryCheckboxes = document.querySelectorAll('input[name="category"]');
     const searchButton = document.querySelector('.search-button');
     const reportErrorBtn = document.getElementById('reportError');
+    const backButton = document.getElementById('backButton');
     
     let currentDrug = null;
     let drugsData = null;
@@ -135,16 +157,28 @@ document.addEventListener('DOMContentLoaded', () => {
         return selected.length > 0 ? selected : ['full'];
     }
     
-    // Функция запуска поиска
+    // Функция возврата на главный экран
+    function goBack() {
+        clearSearch();
+        searchInput.value = '';
+        hideBackButton();
+    }
+
+    // Добавляем обработчик для кнопки возврата
+    backButton.addEventListener('click', goBack);
+
+    // Обновляем функцию startSearch
     function startSearch() {
         const query = searchInput.value.trim().toLowerCase();
         if (query.length >= 2) {
             searchDrugs(query);
+            showBackButton();
         } else {
             errorDiv.textContent = 'Введите минимум 2 символа для поиска';
             errorDiv.style.display = 'block';
             confirmationSection.style.display = 'none';
             drugInfo.style.display = 'none';
+            hideBackButton();
         }
     }
     
@@ -176,19 +210,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Поиск по симптомам
         const symptomResults = Object.entries(symptomsData)
             .filter(([symptom, data]) => {
-                // Поиск по названию симптома
                 if (symptom.toLowerCase().includes(query)) {
                     return true;
                 }
-                
-                // Поиск по содержимому секций
                 return data.sections.some(section => {
-                    // Поиск в заголовке секции
                     if (section.title.toLowerCase().includes(query)) {
                         return true;
                     }
-                    
-                    // Поиск в описаниях
                     return section.description.some(desc => 
                         desc.toLowerCase().includes(query)
                     );
@@ -205,19 +233,54 @@ document.addEventListener('DOMContentLoaded', () => {
         if (allResults.length > 0) {
             showDrugOptions(allResults);
             errorDiv.style.display = 'none';
+            // Показываем секцию результатов с анимацией
+            const resultsSection = document.getElementById('results');
+            resultsSection.style.display = 'block';
+            setTimeout(() => {
+                resultsSection.classList.add('visible');
+            }, 10);
         } else {
             errorDiv.textContent = 'Ничего не найдено';
             errorDiv.style.display = 'block';
             confirmationSection.style.display = 'none';
-            drugInfo.style.display = 'none';
+            // Скрываем секцию результатов с анимацией
+            const resultsSection = document.getElementById('results');
+            resultsSection.classList.remove('visible');
+            setTimeout(() => {
+                resultsSection.style.display = 'none';
+            }, 300);
         }
     }
     
-    // Функция отображения вариантов выбора
+    // Обновляем функцию clearSearch
+    function clearSearch() {
+        searchInput.value = '';
+        const resultsSection = document.getElementById('results');
+        resultsSection.classList.remove('visible');
+        setTimeout(() => {
+            resultsSection.style.display = 'none';
+        }, 300);
+        confirmationSection.style.display = 'none';
+        drugInfo.style.display = 'none';
+        errorDiv.style.display = 'none';
+        reportErrorBtn.style.display = 'none';
+        hideBackButton();
+    }
+
+    // Добавляем обработчик для очистки поиска при нажатии Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            clearSearch();
+        }
+    });
+    
+    // Обновляем функцию showDrugOptions
     function showDrugOptions(results) {
         drugOptions.innerHTML = '';
         confirmationSection.style.display = 'block';
         drugInfo.style.display = 'none';
+        reportErrorBtn.style.display = 'flex';
+        showBackButton();
         
         results.forEach(item => {
             const option = document.createElement('div');
@@ -291,6 +354,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         displayDrugInfo(filteredDrug);
+        // Показываем кнопку сообщения об ошибке
+        reportErrorBtn.style.display = 'flex';
     }
     
     // Функция отображения информации о препарате
@@ -321,11 +386,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         info.innerHTML = content.join('<br><br>');
         drugContent.appendChild(info);
-
-        // Добавляем текст на кнопку сообщения об ошибке
-        if (reportErrorBtn) {
-            reportErrorBtn.textContent = '⚠️ Сообщить об ошибке';
-        }
     }
 
     // Добавляем новую функцию для отображения информации о симптоме
@@ -361,38 +421,51 @@ document.addEventListener('DOMContentLoaded', () => {
         
         info.innerHTML = content.join('');
         drugContent.appendChild(info);
-
-        // Добавляем текст на кнопку сообщения об ошибке
-        if (reportErrorBtn) {
-            reportErrorBtn.textContent = '⚠️ Сообщить об ошибке';
-        }
+        
+        // Показываем кнопку сообщения об ошибке
+        reportErrorBtn.style.display = 'flex';
     }
 
     // Функция для отправки сообщения об ошибке
     async function reportError() {
-        // Получаем данные пользователя
-        const initData = tg.initData || '';
-        let userData;
-        try {
-            userData = JSON.parse(initData);
-        } catch (e) {
-            console.log('Ошибка парсинга initData:', e);
-            userData = null;
+        const errorModal = document.getElementById('errorModal');
+        errorModal.style.display = 'flex';
+        setTimeout(() => {
+            errorModal.classList.add('visible');
+        }, 10);
+    }
+
+    // Функция закрытия модального окна
+    function closeErrorModal() {
+        const errorModal = document.getElementById('errorModal');
+        errorModal.classList.remove('visible');
+        setTimeout(() => {
+            errorModal.style.display = 'none';
+            document.getElementById('errorComment').value = '';
+        }, 300);
+    }
+
+    // Функция отправки сообщения об ошибке
+    async function sendErrorReport() {
+        const comment = document.getElementById('errorComment').value.trim();
+        if (!comment) {
+            tg.showAlert('Пожалуйста, опишите проблему');
+            return;
         }
 
+        const userData = tg.initDataUnsafe;
         let errorData = {
             date: new Date().toLocaleString(),
-            user: userData?.user?.username || tg.initDataUnsafe?.user?.username || 'Не указан',
-            userId: userData?.user?.id || tg.initDataUnsafe?.user?.id || 'Не доступен',
-            context: currentDrug ? `${currentDrug.type === 'symptom' ? 'Симптом' : 'Препарат'}: ${currentDrug.name}` : 'Нет контекста'
+            user: userData?.user?.username || 'Не указан',
+            userId: userData?.user?.id || 'Не доступен',
+            context: currentDrug ? `${currentDrug.type === 'symptom' ? 'Симптом' : 'Препарат'}: ${currentDrug.name}` : 'Поиск',
+            comment: comment
         };
 
-        console.log('Отправляемые данные:', errorData);
-
         try {
-            const url = 'https://script.google.com/macros/s/AKfycbwzMBxTmgfXH-nh-HgIggE_ZltMPT9Ovw1ovMyrWgl8RwQX7DKisA3Iz4XDSeuzyCs0/exec';
+            const url = 'https://script.google.com/macros/s/AKfycbzEDk9Jo4lqJAJ-B8erpNaAb1X71qOHwJeIpOqDqyrpolP8psmL1TpwiGfRR5R7V2yY/exec';
             
-            const response = await fetch(url, {
+            await fetch(url, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: {
@@ -401,22 +474,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(errorData)
             });
 
+            closeErrorModal();
+
             // Создаем и показываем уведомление
             const notification = document.createElement('div');
             notification.className = 'notification';
             notification.textContent = 'Спасибо! Сообщение об ошибке отправлено.';
             document.body.appendChild(notification);
 
-            // Показываем уведомление
             setTimeout(() => notification.classList.add('show'), 100);
-
-            // Скрываем и удаляем через 3 секунды
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
 
-            // Показываем уведомление в Telegram
             tg.showAlert('Спасибо! Сообщение об ошибке отправлено.');
             
         } catch (error) {
@@ -425,14 +496,104 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Добавляем обработчики для модального окна
+    document.getElementById('cancelErrorReport').addEventListener('click', closeErrorModal);
+    document.getElementById('sendErrorReport').addEventListener('click', sendErrorReport);
+    document.getElementById('errorModal').addEventListener('click', (e) => {
+        if (e.target.id === 'errorModal') {
+            closeErrorModal();
+        }
+    });
+
     // Добавляем обработчик для кнопки сообщения об ошибке
     if (reportErrorBtn) {
         reportErrorBtn.addEventListener('click', reportError);
-        console.log('Обработчик для кнопки сообщения об ошибке добавлен');
     } else {
         console.error('Кнопка reportError не найдена в DOM');
     }
 
     // Загружаем данные при инициализации
     loadDrugsData();
+
+    // Инициализация калькулятора
+    const weightInput = document.getElementById('weight');
+    const dehydrationInput = document.getElementById('dehydration');
+    const additionalInput = document.getElementById('additional');
+    const calculatorResults = document.querySelector('.calculator-results');
+
+    // Функция расчета дефицитарного объема
+    function calculateDeficit(weight, dehydration) {
+        return dehydration * weight * 8;
+    }
+
+    // Функция расчета поддерживающего объема
+    function calculateMaintenance(weight) {
+        if (weight <= 20) {
+            return 30 * weight + 70;
+        } else {
+            return 70 * Math.pow(weight, 0.75);
+        }
+    }
+
+    // Функция обновления результатов
+    function updateResults(deficit, maintenance, additional) {
+        document.getElementById('deficit').textContent = Math.round(deficit) + ' мл';
+        document.getElementById('maintenance').textContent = Math.round(maintenance) + ' мл';
+        document.getElementById('additional-result').textContent = Math.round(additional) + ' мл';
+        document.getElementById('total').textContent = Math.round(deficit + maintenance + additional) + ' мл';
+    }
+
+    // Обработчики ввода для автоматического расчета
+    [weightInput, dehydrationInput, additionalInput].forEach(input => {
+        input.addEventListener('input', () => {
+            const weight = parseFloat(weightInput.value) || 0;
+            const dehydration = parseFloat(dehydrationInput.value) || 0;
+            const additional = parseFloat(additionalInput.value) || 0;
+
+            if (weight > 0) {
+                if (dehydration < 0 || dehydration > 100) {
+                    tg.showAlert('Процент дегидратации должен быть от 0 до 100');
+                    return;
+                }
+                const deficit = calculateDeficit(weight, dehydration);
+                const maintenance = calculateMaintenance(weight);
+                calculatorResults.style.display = 'block';
+                updateResults(deficit, maintenance, additional);
+            } else {
+                calculatorResults.style.display = 'none';
+            }
+        });
+    });
+
+    function showBackButton() {
+        const backButton = document.getElementById('backButton');
+        const logo = document.querySelector('.logo');
+        
+        // Сначала скрываем логотип
+        logo.classList.add('hidden');
+        
+        // После начала анимации логотипа показываем кнопку
+        setTimeout(() => {
+            backButton.style.display = 'flex';
+            requestAnimationFrame(() => {
+                backButton.classList.add('visible');
+            });
+        }, 150);
+    }
+
+    function hideBackButton() {
+        const backButton = document.getElementById('backButton');
+        const logo = document.querySelector('.logo');
+        
+        // Сначала скрываем кнопку
+        backButton.classList.remove('visible');
+        
+        // После завершения анимации кнопки показываем логотип
+        setTimeout(() => {
+            backButton.style.display = 'none';
+            requestAnimationFrame(() => {
+                logo.classList.remove('hidden');
+            });
+        }, 150);
+    }
 });

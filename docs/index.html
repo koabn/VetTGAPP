@@ -4,14 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vet App Тест</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="app">
         <div class="container">
+            <div class="logo-container">
+                <button id="backButton" class="back-button" style="display: none;">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <div class="logo">VETПУЛЬС</div>
+            </div>
             <div class="search-section">
-                <input type="text" id="searchInput" placeholder="Введите название препарата..." class="search-input">
+                <input type="text" id="searchInput" placeholder="Введите название препарата или симптома..." class="search-input">
                 <button class="search-button">Найти</button>
+            </div>
+
+            <div class="calculator-section">
+                <div class="calculator-title">Калькулятор инфузионной терапии</div>
+                <div class="calculator-form">
+                    <div class="input-group">
+                        <label for="weight">Вес животного (кг)</label>
+                        <input type="number" id="weight" class="calculator-input" step="0.1" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="dehydration">Процент дегидратации (%)</label>
+                        <input type="number" id="dehydration" class="calculator-input" step="0.1" min="0" max="100">
+                    </div>
+                    <div class="input-group">
+                        <label for="additional">Дополнительные потери (мл)</label>
+                        <input type="number" id="additional" class="calculator-input" step="1" min="0">
+                    </div>
+                </div>
+                <div class="calculator-results" style="display: none;">
+                    <div class="result-item">
+                        <span class="result-label">Дефицитарный объем:</span>
+                        <span id="deficit" class="result-value">0 мл</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Поддерживающий объем:</span>
+                        <span id="maintenance" class="result-value">0 мл</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Дополнительные потери:</span>
+                        <span id="additional-result" class="result-value">0 мл</span>
+                    </div>
+                    <div class="result-item total">
+                        <span class="result-label">Общий объем в сутки:</span>
+                        <span id="total" class="result-value">0 мл</span>
+                    </div>
+                </div>
             </div>
 
             <div id="confirmation-section" class="confirmation-section" style="display: none;">
@@ -19,41 +66,89 @@
                 <div id="drug-options" class="drug-options"></div>
             </div>
 
-            <div id="results" class="results-section">
+            <div id="results" class="results-section" style="display: none;">
                 <div id="drug-info" class="drug-info-container" style="display: none;">
                     <div class="categories-section">
                         <div class="categories-title">Выберите категории информации:</div>
                         <div class="categories-grid">
                             <label class="category-item">
-                                <input type="checkbox" name="category" value="mechanism" checked>
+                                <input type="checkbox" id="mechanism" name="category" value="mechanism" style="display: none;" checked>
+                                <label for="mechanism" class="check">
+                                    <svg width="18px" height="18px" viewBox="0 0 18 18">
+                                        <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
+                                        <polyline points="1 9 7 14 15 4"></polyline>
+                                    </svg>
+                                </label>
                                 <span class="category-text">⚡ Механизм действия</span>
                             </label>
                             <label class="category-item">
-                                <input type="checkbox" name="category" value="indications" checked>
+                                <input type="checkbox" id="indications" name="category" value="indications" style="display: none;" checked>
+                                <label for="indications" class="check">
+                                    <svg width="18px" height="18px" viewBox="0 0 18 18">
+                                        <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
+                                        <polyline points="1 9 7 14 15 4"></polyline>
+                                    </svg>
+                                </label>
                                 <span class="category-text">🎯 Показания</span>
                             </label>
                             <label class="category-item">
-                                <input type="checkbox" name="category" value="side_effects" checked>
+                                <input type="checkbox" id="side_effects" name="category" value="side_effects" style="display: none;" checked>
+                                <label for="side_effects" class="check">
+                                    <svg width="18px" height="18px" viewBox="0 0 18 18">
+                                        <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
+                                        <polyline points="1 9 7 14 15 4"></polyline>
+                                    </svg>
+                                </label>
                                 <span class="category-text">⚕️ Побочные эффекты</span>
                             </label>
                             <label class="category-item">
-                                <input type="checkbox" name="category" value="contraindications" checked>
+                                <input type="checkbox" id="contraindications" name="category" value="contraindications" style="display: none;" checked>
+                                <label for="contraindications" class="check">
+                                    <svg width="18px" height="18px" viewBox="0 0 18 18">
+                                        <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
+                                        <polyline points="1 9 7 14 15 4"></polyline>
+                                    </svg>
+                                </label>
                                 <span class="category-text">⚠️ Противопоказания</span>
                             </label>
                             <label class="category-item">
-                                <input type="checkbox" name="category" value="interactions" checked>
+                                <input type="checkbox" id="interactions" name="category" value="interactions" style="display: none;" checked>
+                                <label for="interactions" class="check">
+                                    <svg width="18px" height="18px" viewBox="0 0 18 18">
+                                        <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
+                                        <polyline points="1 9 7 14 15 4"></polyline>
+                                    </svg>
+                                </label>
                                 <span class="category-text">🔄 Взаимодействия</span>
                             </label>
                             <label class="category-item">
-                                <input type="checkbox" name="category" value="usage" checked>
+                                <input type="checkbox" id="usage" name="category" value="usage" style="display: none;" checked>
+                                <label for="usage" class="check">
+                                    <svg width="18px" height="18px" viewBox="0 0 18 18">
+                                        <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
+                                        <polyline points="1 9 7 14 15 4"></polyline>
+                                    </svg>
+                                </label>
                                 <span class="category-text">💉 Применение</span>
                             </label>
                             <label class="category-item">
-                                <input type="checkbox" name="category" value="storage" checked>
+                                <input type="checkbox" id="storage" name="category" value="storage" style="display: none;" checked>
+                                <label for="storage" class="check">
+                                    <svg width="18px" height="18px" viewBox="0 0 18 18">
+                                        <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
+                                        <polyline points="1 9 7 14 15 4"></polyline>
+                                    </svg>
+                                </label>
                                 <span class="category-text">🏠 Хранение</span>
                             </label>
                             <label class="category-item">
-                                <input type="checkbox" name="category" value="dosage" checked>
+                                <input type="checkbox" id="dosage" name="category" value="dosage" style="display: none;" checked>
+                                <label for="dosage" class="check">
+                                    <svg width="18px" height="18px" viewBox="0 0 18 18">
+                                        <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
+                                        <polyline points="1 9 7 14 15 4"></polyline>
+                                    </svg>
+                                </label>
                                 <span class="category-text">💊 Дозировка</span>
                             </label>
                         </div>
@@ -69,7 +164,23 @@
         </div>
     </div>
 
-    <button class="report-error-btn" id="reportError" title="Сообщить об ошибке">⚠️</button>
+    <button class="report-error-btn" id="reportError" style="display: none;">⚠️</button>
+
+    <!-- Модальное окно для отправки сообщения об ошибке -->
+    <div class="error-modal" id="errorModal">
+        <div class="error-modal-content">
+            <div class="error-modal-header">
+                <h3>Сообщить об ошибке</h3>
+            </div>
+            <div class="error-modal-body">
+                <textarea id="errorComment" placeholder="Опишите, что именно неверно..." rows="4"></textarea>
+            </div>
+            <div class="error-modal-footer">
+                <button class="send-error-btn" id="sendErrorReport">Отправить</button>
+                <button class="cancel-error-btn" id="cancelErrorReport">Отмена</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Эмуляция Telegram WebApp для локального тестирования -->
     <script>
