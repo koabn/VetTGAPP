@@ -162,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearSearch();
         searchInput.value = '';
         hideBackButton();
+        document.querySelector('.calculator-section').style.display = 'block';
     }
 
     // Добавляем обработчик для кнопки возврата
@@ -173,12 +174,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (query.length >= 2) {
             searchDrugs(query);
             showBackButton();
+            document.querySelector('.calculator-section').style.display = 'none';
         } else {
             errorDiv.textContent = 'Введите минимум 2 символа для поиска';
             errorDiv.style.display = 'block';
             confirmationSection.style.display = 'none';
             drugInfo.style.display = 'none';
             hideBackButton();
+            document.querySelector('.calculator-section').style.display = 'block';
         }
     }
     
