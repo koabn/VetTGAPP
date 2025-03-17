@@ -364,6 +364,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Показываем калькулятор при возврате на главную
         document.querySelector('.calculator-section').style.display = 'block';
+        
+        // Сбрасываем видимость фильтров
+        document.querySelector('.categories-section').style.display = 'block';
     }
 
     // Добавляем обработчик для очистки поиска при нажатии Escape
@@ -410,9 +413,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 resultsSection.classList.add('visible');
                 drugInfo.style.display = 'block';
                 
+                // Показываем/скрываем секцию с фильтрами в зависимости от типа
+                const categoriesSection = document.querySelector('.categories-section');
                 if (item.type === 'symptom') {
+                    categoriesSection.style.display = 'none';
                     displaySymptomInfo(item);
                 } else {
+                    categoriesSection.style.display = 'block';
                     displayFilteredDrugInfo(item);
                 }
             });
