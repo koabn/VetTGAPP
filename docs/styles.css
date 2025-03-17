@@ -972,4 +972,47 @@ input[type="checkbox"]:checked + .check svg polyline {
     .result-item {
         padding: 10px;
     }
+}
+
+.report-error-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: auto !important;
+    height: auto !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    background: var(--error-bg-color) !important;
+    border: 1px solid var(--error-border-color) !important;
+    color: var(--error-color) !important;
+    font-size: 14px !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    margin: 0 !important;
+    z-index: 100;
+}
+
+.report-error-btn::before {
+    content: "Сообщить об ошибке";
+    font-size: 14px;
+}
+
+.report-error-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 68, 68, 0.2);
+    background: var(--error-bg-color) !important;
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .report-error-btn {
+        bottom: 16px;
+        right: 16px;
+        padding: 6px 12px !important;
+        font-size: 13px !important;
+    }
 } 

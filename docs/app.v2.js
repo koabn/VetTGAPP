@@ -162,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearSearch();
         searchInput.value = '';
         hideBackButton();
+        // Показываем калькулятор при возврате назад
         document.querySelector('.calculator-section').style.display = 'block';
     }
 
@@ -203,6 +204,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        // Скрываем калькулятор при поиске
+        document.querySelector('.calculator-section').style.display = 'none';
+        
         // Поиск по препаратам
         const drugResults = drugsData.filter(drug => {
             const nameMatch = drug.name.toLowerCase().includes(query);
@@ -233,25 +237,20 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const allResults = [...drugResults, ...symptomResults];
         
+        // Скрываем все секции результатов сначала
+        const resultsSection = document.getElementById('results');
+        resultsSection.style.display = 'none';
+        confirmationSection.style.display = 'none';
+        drugInfo.style.display = 'none';
+        
         if (allResults.length > 0) {
             showDrugOptions(allResults);
             errorDiv.style.display = 'none';
-            // Показываем секцию результатов с анимацией
-            const resultsSection = document.getElementById('results');
-            resultsSection.style.display = 'block';
-            setTimeout(() => {
-                resultsSection.classList.add('visible');
-            }, 10);
+            // Показываем только секцию с подтверждением
+            confirmationSection.style.display = 'block';
         } else {
             errorDiv.textContent = 'Ничего не найдено';
             errorDiv.style.display = 'block';
-            confirmationSection.style.display = 'none';
-            // Скрываем секцию результатов с анимацией
-            const resultsSection = document.getElementById('results');
-            resultsSection.classList.remove('visible');
-            setTimeout(() => {
-                resultsSection.style.display = 'none';
-            }, 300);
         }
     }
     
@@ -268,6 +267,9 @@ document.addEventListener('DOMContentLoaded', () => {
         errorDiv.style.display = 'none';
         reportErrorBtn.style.display = 'none';
         hideBackButton();
+        
+        // Показываем калькулятор при возврате на главную
+        document.querySelector('.calculator-section').style.display = 'block';
     }
 
     // Добавляем обработчик для очистки поиска при нажатии Escape
@@ -307,7 +309,13 @@ document.addEventListener('DOMContentLoaded', () => {
             option.addEventListener('click', () => {
                 currentDrug = item;
                 confirmationSection.style.display = 'none';
+                
+                // Показываем секцию результатов и информацию о препарате
+                const resultsSection = document.getElementById('results');
+                resultsSection.style.display = 'block';
+                resultsSection.classList.add('visible');
                 drugInfo.style.display = 'block';
+                
                 if (item.type === 'symptom') {
                     displaySymptomInfo(item);
                 } else {
@@ -389,6 +397,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         info.innerHTML = content.join('<br><br>');
         drugContent.appendChild(info);
+        
+        // Показываем кнопку сообщения об ошибке
+        reportErrorBtn.style.display = 'flex';
     }
 
     // Добавляем новую функцию для отображения информации о симптоме
