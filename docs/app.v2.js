@@ -196,6 +196,43 @@ document.addEventListener('DOMContentLoaded', () => {
     
     searchButton.addEventListener('click', startSearch);
     
+    // Добавляем функцию расчета расстояния Левенштейна
+    function levenshteinDistance(str1, str2) {
+        const m = str1.length;
+        const n = str2.length;
+        const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+
+        for (let i = 0; i <= m; i++) {
+            dp[i][0] = i;
+        }
+        for (let j = 0; j <= n; j++) {
+            dp[0][j] = j;
+        }
+
+        for (let i = 1; i <= m; i++) {
+            for (let j = 1; j <= n; j++) {
+                if (str1[i - 1] === str2[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = Math.min(
+                        dp[i - 1][j - 1] + 1,  // замена
+                        dp[i - 1][j] + 1,      // удаление
+                        dp[i][j - 1] + 1       // вставка
+                    );
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+    // Добавляем функцию проверки схожести строк
+    function stringSimilarity(str1, str2) {
+        const maxLength = Math.max(str1.length, str2.length);
+        if (maxLength === 0) return 1.0;
+        const distance = levenshteinDistance(str1, str2);
+        return 1 - distance / maxLength;
+    }
+
     // Функция поиска препаратов
     function searchDrugs(query) {
         if (!drugsData || !symptomsData) {
@@ -207,33 +244,91 @@ document.addEventListener('DOMContentLoaded', () => {
         // Скрываем калькулятор при поиске
         document.querySelector('.calculator-section').style.display = 'none';
         
-        // Поиск по препаратам
+        const threshold = 0.7; // Порог схожести (можно настроить)
+        query = query.toLowerCase();
+        
+        // Поиск по препаратам с учетом схожести
         const drugResults = drugsData.filter(drug => {
+            // Точное совпадение
             const nameMatch = drug.name.toLowerCase().includes(query);
             const tradeMatch = drug.trade_names && drug.trade_names.toLowerCase().includes(query);
-            return nameMatch || tradeMatch;
-        });
+            
+            if (nameMatch || tradeMatch) return true;
+            
+            // Нечеткий поиск
+            const nameSimilarity = Math.max(
+                ...drug.name.toLowerCase().split(/\s+/).map(word => 
+                    stringSimilarity(word, query)
+                )
+            );
+            
+            const tradeSimilarity = drug.trade_names ? Math.max(
+                ...drug.trade_names.toLowerCase().split(/\s+/).map(word => 
+                    stringSimilarity(word, query)
+                )
+            ) : 0;
+            
+            return nameSimilarity >= threshold || tradeSimilarity >= threshold;
+        }).map(drug => ({
+            ...drug,
+            relevance: Math.max(
+                ...drug.name.toLowerCase().split(/\s+/).map(word => 
+                    stringSimilarity(word, query)
+                ),
+                ...(drug.trade_names ? 
+                    drug.trade_names.toLowerCase().split(/\s+/).map(word => 
+                        stringSimilarity(word, query)
+                    ) : []
+                )
+            )
+        })).sort((a, b) => b.relevance - a.relevance);
         
-        // Поиск по симптомам
+        // Поиск по симптомам с учетом схожести
         const symptomResults = Object.entries(symptomsData)
             .filter(([symptom, data]) => {
-                if (symptom.toLowerCase().includes(query)) {
-                    return true;
-                }
+                // Точное совпадение
+                if (symptom.toLowerCase().includes(query)) return true;
+                
+                // Нечеткий поиск в названии симптома
+                const symptomSimilarity = Math.max(
+                    ...symptom.toLowerCase().split(/\s+/).map(word => 
+                        stringSimilarity(word, query)
+                    )
+                );
+                
+                if (symptomSimilarity >= threshold) return true;
+                
+                // Поиск в секциях
                 return data.sections.some(section => {
-                    if (section.title.toLowerCase().includes(query)) {
-                        return true;
-                    }
-                    return section.description.some(desc => 
-                        desc.toLowerCase().includes(query)
+                    const titleSimilarity = Math.max(
+                        ...section.title.toLowerCase().split(/\s+/).map(word => 
+                            stringSimilarity(word, query)
+                        )
                     );
+                    
+                    if (titleSimilarity >= threshold) return true;
+                    
+                    return section.description.some(desc => {
+                        const descSimilarity = Math.max(
+                            ...desc.toLowerCase().split(/\s+/).map(word => 
+                                stringSimilarity(word, query)
+                            )
+                        );
+                        return descSimilarity >= threshold;
+                    });
                 });
             })
             .map(([symptom, data]) => ({
                 name: symptom,
                 type: 'symptom',
-                sections: data.sections
-            }));
+                sections: data.sections,
+                relevance: Math.max(
+                    ...symptom.toLowerCase().split(/\s+/).map(word => 
+                        stringSimilarity(word, query)
+                    )
+                )
+            }))
+            .sort((a, b) => b.relevance - a.relevance);
         
         const allResults = [...drugResults, ...symptomResults];
         
@@ -246,7 +341,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (allResults.length > 0) {
             showDrugOptions(allResults);
             errorDiv.style.display = 'none';
-            // Показываем только секцию с подтверждением
             confirmationSection.style.display = 'block';
         } else {
             errorDiv.textContent = 'Ничего не найдено';
