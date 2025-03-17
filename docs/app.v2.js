@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 selected.push(checkbox.value);
             }
         });
-        return selected.length > 0 ? selected : ['full'];
+        return selected;
     }
     
     // Функция возврата на главный экран
@@ -421,44 +421,62 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Функция фильтрации и отображения информации о препарате
+    // Функция отображения отфильтрованной информации о препарате
     function displayFilteredDrugInfo(drug) {
-        const categories = getSelectedCategories();
-        const filteredDrug = {};
+        drugContent.innerHTML = '';
         
-        // Всегда включаем базовую информацию
-        filteredDrug.name = drug.name;
-        filteredDrug.trade_names = drug.trade_names;
-        filteredDrug.classification = drug.classification;
+        const title = document.createElement('div');
+        title.className = 'drug-title';
+        title.textContent = drug.name;
+        drugContent.appendChild(title);
         
-        // Добавляем выбранные категории
-        if (categories.includes('full') || categories.includes('mechanism')) {
-            filteredDrug.mechanism = drug.mechanism;
-        }
-        if (categories.includes('full') || categories.includes('indications')) {
-            filteredDrug.indications = drug.indications;
-        }
-        if (categories.includes('full') || categories.includes('side_effects')) {
-            filteredDrug.side_effects = drug.side_effects;
-        }
-        if (categories.includes('full') || categories.includes('contraindications')) {
-            filteredDrug.contraindications = drug.contraindications;
-        }
-        if (categories.includes('full') || categories.includes('interactions')) {
-            filteredDrug.interactions = drug.interactions;
-        }
-        if (categories.includes('full') || categories.includes('usage')) {
-            filteredDrug.usage = drug.usage;
-        }
-        if (categories.includes('full') || categories.includes('storage')) {
-            filteredDrug.storage = drug.storage;
-        }
-        if (categories.includes('full') || categories.includes('dosage')) {
-            filteredDrug.cat_dosage = drug.cat_dosage;
-            filteredDrug.dog_dosage = drug.dog_dosage;
+        const info = document.createElement('div');
+        info.className = 'drug-info';
+        
+        let content = [];
+        const selectedCategories = getSelectedCategories();
+        
+        // Базовая информация всегда отображается
+        if (drug.trade_names) content.push(`💊 Торговые названия: ${drug.trade_names}`);
+        if (drug.classification) content.push(`📦 Группа: ${drug.classification}`);
+        
+        // Если ни одна категория не выбрана или выбраны конкретные категории
+        if (selectedCategories.length === 0) {
+            // Показываем всю информацию
+            if (drug.mechanism) content.push(`⚡ Механизм действия: ${drug.mechanism}`);
+            if (drug.indications) content.push(`🎯 Показания: ${drug.indications}`);
+            if (drug.side_effects) content.push(`⚕️ Побочные эффекты: ${drug.side_effects}`);
+            if (drug.contraindications) content.push(`⚠️ Противопоказания: ${drug.contraindications}`);
+            if (drug.interactions) content.push(`🔄 Взаимодействия: ${drug.interactions}`);
+            if (drug.usage) content.push(`💉 Применение: ${drug.usage}`);
+            if (drug.storage) content.push(`🏠 Хранение: ${drug.storage}`);
+            if (drug.cat_dosage) content.push(`🐱 Дозировка для кошек: ${drug.cat_dosage}`);
+            if (drug.dog_dosage) content.push(`🐕 Дозировка для собак: ${drug.dog_dosage}`);
+        } else {
+            // Показываем только выбранные категории
+            if (selectedCategories.includes('mechanism') && drug.mechanism) 
+                content.push(`⚡ Механизм действия: ${drug.mechanism}`);
+            if (selectedCategories.includes('indications') && drug.indications) 
+                content.push(`🎯 Показания: ${drug.indications}`);
+            if (selectedCategories.includes('side_effects') && drug.side_effects) 
+                content.push(`⚕️ Побочные эффекты: ${drug.side_effects}`);
+            if (selectedCategories.includes('contraindications') && drug.contraindications) 
+                content.push(`⚠️ Противопоказания: ${drug.contraindications}`);
+            if (selectedCategories.includes('interactions') && drug.interactions) 
+                content.push(`🔄 Взаимодействия: ${drug.interactions}`);
+            if (selectedCategories.includes('usage') && drug.usage) 
+                content.push(`💉 Применение: ${drug.usage}`);
+            if (selectedCategories.includes('storage') && drug.storage) 
+                content.push(`🏠 Хранение: ${drug.storage}`);
+            if (selectedCategories.includes('dosage')) {
+                if (drug.cat_dosage) content.push(`🐱 Дозировка для кошек: ${drug.cat_dosage}`);
+                if (drug.dog_dosage) content.push(`🐕 Дозировка для собак: ${drug.dog_dosage}`);
+            }
         }
         
-        displayDrugInfo(filteredDrug);
+        info.innerHTML = content.join('<br><br>');
+        drugContent.appendChild(info);
+        
         // Показываем кнопку сообщения об ошибке
         reportErrorBtn.style.display = 'flex';
     }
