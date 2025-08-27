@@ -8,6 +8,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <meta name="theme-color" content="#232323">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
 </head>
 <body>
     <div id="app">
@@ -203,5 +208,14 @@
     
     <!-- Подключаем наш основной скрипт -->
     <script src="app.v2.js"></script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(function(reg) { console.log('SW зарегистрирован', reg.scope); })
+                .catch(function(err) { console.warn('SW ошибка регистрации', err); });
+        });
+    }
+    </script>
 </body>
 </html> 
